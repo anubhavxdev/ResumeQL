@@ -24,7 +24,7 @@
 
 <div align="center">
 
-## okay Real talk.
+## okay real talk.
 
 </div>
 
