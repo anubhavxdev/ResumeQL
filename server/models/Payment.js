@@ -14,7 +14,9 @@ const paymentSchema = new mongoose.Schema({
     type: String,
     enum: ["created", "paid", "failed"],
     default: "created"
-  }
+  },
+  idempotencyKey: String,
+  verifiedAt: Date
 }, { timestamps: true });
 
 module.exports = mongoose.model("Payment", paymentSchema);

@@ -18,7 +18,9 @@ exports.signup = async (req, res) => {
       isLPU: registrationNumber?.startsWith("LPU")
     });
 
-    res.json(user);
+    const userObj = user.toObject();
+    delete userObj.password;
+    res.status(201).json(userObj);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -34,9 +36,10 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ msg: "Invalid password" });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.json({ token, user });
+    const { password: _, ...safeUser } = user.toObject();
+    res.json({ token, user: safeUser });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }

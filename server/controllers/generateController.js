@@ -3,6 +3,8 @@ const fs = require("fs");
 const { calculateATS } = require("../utils/ats");
 const { generateContent } = require("../utils/gemini");
 const { buildPrompt } = require("../utils/promptEngine");
+const User = require("../models/User");
+const Resume = require("../models/Resume");
 
 exports.downloadResumePDF = async (req, res) => {
   try {
@@ -13,12 +15,12 @@ exports.downloadResumePDF = async (req, res) => {
     }
     //limit latex input size to prevent abuse
     if (latex.length > 50000) {
-        return res.status(400).json({ msg: "Latex too large" });
+      return res.status(400).json({ msg: "Latex too large" });
     }
 
     //prevent injection
     if (latex.includes("\\write18")) {
-        return res.status(400).json({ msg: "Unsafe LaTeX" });
+      return res.status(400).json({ msg: "Unsafe LaTeX" });
     }
 
     const { pdfPath, dir } = await generatePDF(latex);
@@ -47,7 +49,8 @@ exports.getATSScore = async (req, res) => {
 
     const result = calculateATS(cv, jd);
 
-    const prompt = buildPrompt(cv, jd, latex);
+    // FIX: getATSScore does not use latex — pass cv as the resume content for prompt
+    const prompt = buildPrompt(cv, jd);
 
     let suggestions;
     for (let i = 0; i < 2; i++) {
@@ -74,13 +77,13 @@ exports.getATSScore = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: "ATS failed" });
+    res.status(500).json({ msg: "ATS failed", error: err.message });
   }
 };
 
 exports.generateResume = async (req, res) => {
   try {
-    const { cv, jd, latex } = req.body;
+    const { cv, jd } = req.body;
 
     const user = await User.findById(req.user.id);
 
@@ -90,7 +93,7 @@ exports.generateResume = async (req, res) => {
       return res.status(400).json({ msg: "Not enough coins" });
     }
 
-    const prompt = buildPrompt(cv, jd, latex);
+    const prompt = buildPrompt(cv, jd);
 
     let updatedLatex;
     for (let i = 0; i < 2; i++) {
@@ -141,7 +144,6 @@ exports.generateResume = async (req, res) => {
       userId: user._id,
       cv,
       jd,
-      latex,
       updatedLatex
     });
 
@@ -151,6 +153,20 @@ exports.generateResume = async (req, res) => {
     });
 
   } catch (err) {
-    res.status(500).json({ msg: "Server Error" });
+    console.error(err);
+    res.status(500).json({ msg: "Server Error", error: err.message });
+  }
+};
+
+exports.getUserResumes = async (req, res) => {
+  try {
+    const resumes = await Resume.find({ userId: req.user.id })
+      .sort({ createdAt: -1 })
+      .select("-__v");
+
+    res.json({ resumes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Failed to fetch resume history" });
   }
 };

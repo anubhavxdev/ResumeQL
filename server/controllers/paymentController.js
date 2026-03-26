@@ -27,11 +27,20 @@ const validatePaymentInput = (amount, coins) => {
     return { valid: false, msg: `Amount must be between ${MIN_AMOUNT/100} and ${MAX_AMOUNT/100} INR` };
   }
 
-  // Verify amount-to-coins ratio (prevent manipulation)
-  const expectedCoins = (amount / 100) * COINS_PER_RUPEE;
-  const coinsDifference = Math.abs(coins - expectedCoins);
-  if (coinsDifference > 1) {
-    return { valid: false, msg: "Invalid coin amount for given payment" };
+  // Define allowed plans to accurately verify coins (allow some bonus)
+  const allowedPlans = [
+    { amount: 10, coins: 500 },
+    { amount: 49, coins: 2500 },
+    { amount: 99, coins: 6000 }
+  ];
+
+  const plan = allowedPlans.find(p => p.amount === amount && p.coins === coins);
+  if (!plan) {
+    // Basic ratio fallback for other amounts (50 coins per Rupee)
+    const expectedCoins = (amount / 1) * COINS_PER_RUPEE;
+    if (Math.abs(coins - expectedCoins) > 1) {
+        return { valid: false, msg: "Invalid coin amount for this payment" };
+    }
   }
 
   return { valid: true };

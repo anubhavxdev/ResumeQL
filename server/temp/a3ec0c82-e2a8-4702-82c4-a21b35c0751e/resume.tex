@@ -1,0 +1,157 @@
+\documentclass[10pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[
+  top=0.5in,
+  bottom=0.5in,
+  left=0.65in,
+  right=0.65in
+]{geometry}
+
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{microtype}
+
+%% Exact PDF colors
+\definecolor{headingblue}{RGB}{44,45,146}
+\definecolor{linknavy}{RGB}{23,54,93}
+
+\hypersetup{colorlinks=true, urlcolor=linknavy, linkcolor=linknavy}
+
+%% Section heading: small caps, colored, rule beneath
+\titleformat{\section}
+  {\color{headingblue}\fontsize{9.5pt}{11pt}\selectfont\scshape}
+  {}{0em}{}
+  [\color{headingblue}\titlerule]
+\titlespacing{\section}{0pt}{8pt}{4pt}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+%% Tight bullet lists
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, parsep=0pt, topsep=2pt, label=\textbullet}
+
+%% Job/project row: bold colored left, date right
+\newcommand{\entryrow}[2]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}X@{\hspace{4pt}}r@{}}
+    {\color{headingblue}\bfseries\fontsize{8.5pt}{10pt}\selectfont #1} &
+    {\fontsize{8.5pt}{10pt}\selectfont #2}
+  \end{tabularx}\par\vspace{1pt}%
+}
+
+%% Education institution row
+\newcommand{\instituterow}[2]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}X@{\hspace{4pt}}r@{}}
+    {\color{headingblue}\bfseries\fontsize{10pt}{12pt}\selectfont #1} &
+    {\fontsize{8.5pt}{10pt}\selectfont #2}
+  \end{tabularx}%
+}
+
+\begin{document}
+
+%% ── HEADER ───────────────────────────────────────────────────────────
+{\color{headingblue}\bfseries\fontsize{18pt}{22pt}\selectfont Gaurav Nayyar}\par
+\vspace{3pt}
+\begin{tabularx}{\linewidth}{@{}X@{}r@{}}
+  {\fontsize{8.5pt}{10pt}\selectfont LinkedIn:~\href{https://www.linkedin.com/in/nayyar-gaurav/}{https://www.linkedin.com/in/nayyar-graurav/}} &
+  {\fontsize{8.5pt}{10pt}\selectfont Email:~\href{mailto:gauravnayyar8603@gmail.com}{gauravnayyar8603@gmail.com}} \\[1pt]
+  {\fontsize{8.5pt}{10pt}\selectfont GitHub:~\href{https://github.com/G4uravXDev}{https://github.com/G4uravXDev}} &
+  {\fontsize{8.5pt}{10pt}\selectfont Mobile:~+91-6287231231}
+\end{tabularx}
+
+%% ── SKILLS ───────────────────────────────────────────────────────────
+\section{Skills}
+\begin{itemize}
+  \item {\color{headingblue}\bfseries Languages}:\enspace Python, Java, JavaScript, TypeScript, HTML/CSS
+  \item {\color{headingblue}\bfseries AI/ML & Data Science}:\enspace Machine Learning, Deep Learning, Natural Language Processing (NLP), GeminiAPI, Prompt Engineering, Data Analysis
+  \item {\color{headingblue}\bfseries Frameworks/Libraries}:\enspace ReactJS, NodeJS, ExpressJS, SpringBoot, Tailwind CSS, REST API
+  \item {\color{headingblue}\bfseries Databases}:\enspace MySQL, MongoDB, PostgreSQL, Firebase
+  \item {\color{headingblue}\bfseries Tools/Platforms}:\enspace Git, GitHub, Postman, Docker, Cloudflare, Power Automate, N8N
+  \item {\color{headingblue}\bfseries Development Methodologies}:\enspace Data Structures & Algorithms (DSA), Object-Oriented Programming (OOP), System Design, Scalable Architecture, Agile Development
+  \item {\color{headingblue}\bfseries Soft Skills}:\enspace Leadership, Problem-Solving, Adaptability, Continuous Learning, Team Collaboration
+\end{itemize}
+
+%% ── EXPERIENCE ───────────────────────────────────────────────────────
+\section{Experience}
+
+\entryrow{Summer Trainee \textbar{} Lovely Professional University}{Jun' 25 -- July' 25}
+\begin{itemize}
+  \item Built comprehensive cybercrime awareness portal, enhancing resource management and user engagement by 20\%.
+  \item Developed role-based admin dashboard, streamlining content organization for 500+ learners and administrators.
+  \item Implemented full-stack TypeScript application, ensuring secure backend operations and 15\% faster content delivery.
+  \item Integrated GeminiAPI for AI-driven content generation, improving module relevance and user comprehension by 10\%.
+\end{itemize}
+
+\vspace{5pt}
+\entryrow{Additional Experience (Not Provided)}{}
+\begin{itemize}
+\end{itemize}
+
+%% ── PROJECTS ─────────────────────────────────────────────────────────
+\section{Projects}
+
+\entryrow{Cybersecurity Awareness Portal \textbar{} Live \textbar{}~\href{https://github.com/G4uravXDev}{\textcolor{linknavy}{\ensuremath{\mathcal{P}}}}}{Sept' 25 -- Oct' 25}
+\begin{itemize}
+  \item Developed comprehensive portal, boosting cybercrime awareness by 25\% through interactive modules.
+  \item Engineered role-based admin dashboard, enhancing content management efficiency by 30\% for administrators.
+  \item Implemented full-stack TypeScript app, securing content delivery and backend operations for users.
+  \item Integrated GeminiAPI for AI-powered content, personalizing learning paths and increasing engagement by 15\%.
+  \item \textbf{Tech Stack:} ReactJS, NodeJS, TypeScript, GeminiAPI, Tailwind CSS, Firebase
+\end{itemize}
+
+\vspace{5pt}
+\entryrow{EventOne \textbar{} Event Management Platform \textbar{}~\href{https://github.com/G4uravXDev}{\textcolor{linknavy}{\ensuremath{\mathcal{P}}}}}{Dec' 25 -- Jan' 26}
+\begin{itemize}
+  \item Engineered scalable event platform, improving management for 1000+ users with robust RBAC.
+  \item Integrated secure payment gateway, enabling seamless QR-based ticket generation and 99\% verification accuracy.
+  \item Containerized application with Docker, achieving 20\% faster deployment and enhanced security via Cloudflare.
+  \item \textbf{Tech Stack:} ReactJS, NodeJS, ExpressJS, PostgreSQL, GeminiAPI, Docker, TailwindCSS, Firebase, Cloudflare
+\end{itemize}
+
+%% ── CERTIFICATES ─────────────────────────────────────────────────────
+\section{Certificates}
+
+\begin{itemize}[itemsep=5pt]
+  \item Cloud Computing \textbar{} NPTEL \textbar{} \href{https://example.com/certificate}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Oct' 25}
+  \item Concepts in SQL \textbar{} Coursera \textbar{} \href{https://example.com/certificate}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Sept' 25}
+  \item Foundations of User Experience (UX) Design \textbar{} Coursera \textbar{} \href{https://example.com/certificate}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Sept' 25}
+\end{itemize}
+
+%% ── ACHIEVEMENTS ─────────────────────────────────────────────────────
+\section{Achievements}
+
+\begin{itemize}
+  \item Led AWS Cloud Community as Core Member, delivering 10+ technical sessions to 200+ attendees.
+  \item Won AI/ML Track at InnovateX Hackathon, developing innovative AI solution that outperformed rivals by 15\%.
+  \item Solved 120+ LeetCode problems, mastering DSA and optimizing algorithms for 20\% performance gains.
+\end{itemize}
+
+%% ── EDUCATION ────────────────────────────────────────────────────────
+\section{Education}
+\vspace{4pt}
+\begin{itemize}[itemsep=8pt]
+
+  \item
+    \instituterow{Lovely Professional University}{Punjab, India}\\[1pt]
+    {\fontsize{8.5pt}{10pt}\selectfont Bachelor of Technology \hfill Aug' 23 -- Present}\\
+    {\fontsize{8.5pt}{10pt}\selectfont Computer Science and Engineering: CGPA: 7.3}
+
+  \item
+    \instituterow{Valley View School}{Jamshedpur, India}\\[1pt]
+    {\fontsize{8.5pt}{10pt}\selectfont Intermediate: PCM \hfill Apr' 22 -- Mar' 23}\\
+    {\fontsize{8.5pt}{10pt}\selectfont Percentage:\quad 63\%}
+
+\end{itemize}
+
+\end{document}

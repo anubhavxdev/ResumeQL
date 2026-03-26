@@ -1,0 +1,151 @@
+\documentclass[10pt, a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[
+  top=0.5in,
+  bottom=0.5in,
+  left=0.65in,
+  right=0.65in
+]{geometry}
+
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{microtype}
+
+\definecolor{headingblue}{RGB}{44,45,146}
+\definecolor{linknavy}{RGB}{23,54,93}
+
+\hypersetup{colorlinks=true, urlcolor=linknavy, linkcolor=linknavy}
+
+\titleformat{\section}
+  {\color{headingblue}\fontsize{9.5pt}{11pt}\selectfont\scshape}
+  {}{0em}{}
+  [\color{headingblue}\titlerule]
+\titlespacing{\section}{0pt}{8pt}{4pt}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\setlist[itemize]{leftmargin=1.4em, itemsep=1pt, parsep=0pt, topsep=2pt, label=\textbullet}
+
+\newcommand{\entryrow}[2]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}X@{\hspace{4pt}}r@{}}
+    {\color{headingblue}\bfseries\fontsize{8.5pt}{10pt}\selectfont #1} &
+    {\fontsize{8.5pt}{10pt}\selectfont #2}
+  \end{tabularx}\par\vspace{1pt}%
+}
+
+\newcommand{\instituterow}[2]{%
+  \noindent\begin{tabularx}{\linewidth}{@{}X@{\hspace{4pt}}r@{}}
+    {\color{headingblue}\bfseries\fontsize{10pt}{12pt}\selectfont #1} &
+    {\fontsize{8.5pt}{10pt}\selectfont #2}
+  \end{tabularx}%
+}
+
+\begin{document}
+
+%% HEADER
+{\color{headingblue}\bfseries\fontsize{18pt}{22pt}\selectfont Gaurav Nayyar}\par
+\vspace{3pt}
+\begin{tabularx}{\linewidth}{@{}X@{}r@{}}
+  {\fontsize{8.5pt}{10pt}\selectfont LinkedIn:~\href{https://www.linkedin.com/in/nayyar-gaurav/}{https://www.linkedin.com/in/nayyar-gaurav/}} &
+  {\fontsize{8.5pt}{10pt}\selectfont Email:~\href{mailto:gauravnayyar8603@gmail.com}{gauravnayyar8603@gmail.com}} \\[1pt]
+  {\fontsize{8.5pt}{10pt}\selectfont GitHub:~\href{https://github.com/G4uravXDev}{https://github.com/G4uravXDev}} &
+  {\fontsize{8.5pt}{10pt}\selectfont Mobile:~+91-6287231231}
+\end{tabularx}
+
+%% SKILLS
+\section{Skills}
+\begin{itemize}
+  \item {\color{headingblue}\bfseries Languages}:\enspace Python, Java, JavaScript, HTML, CSS, TypeScript
+  \item {\color{headingblue}\bfseries Frameworks}:\enspace ReactJS, NodeJS, ExpressJS, Tailwind CSS, REST API, NextJS, MERN Stack
+  \item {\color{headingblue}\bfseries Databases}:\enspace MySQL, MongoDB, PostgreSQL
+  \item {\color{headingblue}\bfseries Tools/Platforms}:\enspace Git, GitHub, Postman, Firebase, Supabase, Docker, Cloudflare, Figma, Vercel
+  \item {\color{headingblue}\bfseries Technical Skills}:\enspace AI Development, Machine Learning, Full-Stack Development, System Design, DSA, OOP
+  \item {\color{headingblue}\bfseries Soft Skills}:\enspace Leadership, Problem Solving, Adaptability, Continuous Learning
+\end{itemize}
+
+%% EXPERIENCE
+\section{Experience}
+
+\entryrow{Software Developer Intern \textbar{} Division of Infotech, LPU}{Jan' 26 -- Present}
+\begin{itemize}
+  \item Architected and developed scalable full-stack web applications, integrating AI models to enhance user interaction by 35\%.
+  \item Managed backend services with Node.js/Express.js, improving API response by 20% for 10K+ users.
+  \item Implemented robust frontend components with React.js/TypeScript, boosting UI performance by 15% across key features.
+  \item Executed deployment strategies leveraging Docker and Cloudflare, ensuring 99.9% application availability and security.
+\end{itemize}
+
+\vspace{5pt}
+\entryrow{Summer Trainee \textbar{} Lovely Professional University}{Jun' 25 -- July' 25}
+\begin{itemize}
+  \item Led full-stack cybercrime portal development with React.js/Node.js, increasing user engagement by 25%.
+  \item Engineered secure, role-based admin dashboard, enhancing content management efficiency by 30%.
+  \item Implemented scalable TypeScript application with client/server components, ensuring secure backend operations.
+\end{itemize}
+
+%% PROJECTS
+\section{Projects}
+
+\entryrow{Cybersecurity Awareness Portal \textbar{} AI/Full-Stack Web App \textbar{}~\href{https://github.com/G4uravXDev}{\textcolor{linknavy}{\ensuremath{\mathcal{P}}}}}{Sept' 25 -- Oct' 25}
+\begin{itemize}
+  \item Designed full-stack cybercrime portal with React.js/Node.js, integrating GeminiAI for enhanced content.
+  \item Implemented a role-based admin dashboard, streamlining educational resource management and user provisioning by 40%.
+  \item Executed a TypeScript architecture on Firebase, ensuring secure backend operations and improved content delivery speed by 20%.
+\end{itemize}
+
+\vspace{5pt}
+\entryrow{EventOne \textbar{} Event Management Platform \textbar{}~\href{https://github.com/G4uravXDev}{\textcolor{linknavy}{\ensuremath{\mathcal{P}}}}}{Dec' 25 -- Jan' 26}
+\begin{itemize}
+  \item Engineered scalable full-stack event platform with RBAC, processing 500+ attendees, reducing overhead by 30%.
+  \item Integrated secure payments and AI-powered QR tickets, improving verification by 50% and reducing fraud.
+  \item Containerized with Docker and deployed with Cloudflare, achieving 99.9% uptime and enhancing security posture.
+\end{itemize}
+
+%% CERTIFICATES
+\section{Certificates}
+
+\begin{itemize}[itemsep=5pt]
+  \item Cloud Computing \textbar{} NPTEL \textbar{} \href{https://github.com/G4uravXDev}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Oct' 25}
+  \item Concepts in SQL \textbar{} Coursera \textbar{} \href{https://github.com/G4uravXDev}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Sept' 25}
+  \item Foundations of User Experience (UX) Design \textbar{} Coursera \textbar{} \href{https://github.com/G4uravXDev}{\textcolor{linknavy}{Certificate}}
+        \hfill {\fontsize{8.5pt}{10pt}\selectfont Sept' 25}
+\end{itemize}
+
+%% ACHIEVEMENTS
+\section{Achievements}
+
+\begin{itemize}
+  \item \textbf{Core Member at AWS Cloud Community:} Led 10+ AWS Cloud Community sessions, educating 200+ members on cloud and full-stack development.
+  \item \textbf{AI/ML Track Winner, InnovateX Hackathon (IIIT Kalyani):} Awarded AI/ML Track Winner at InnovateX Hackathon, developing innovative AI solutions, outperforming 50+ teams.
+  \item Solved \textbf{120+ Data Structures and Algorithms} problems on \textbf{LeetCode}, strengthening problem-solving and optimization skills.
+\end{itemize}
+
+%% EDUCATION
+\section{Education}
+\vspace{4pt}
+\begin{itemize}[itemsep=8pt]
+
+  \item
+    \instituterow{Lovely Professional University}{Punjab, India}\\[1pt]
+    {\fontsize{8.5pt}{10pt}\selectfont Bachelor of Technology \hfill Aug' 23 -- Present}\\
+    {\fontsize{8.5pt}{10pt}\selectfont Computer Science and Engineering: CGPA: 7.3}
+
+  \item
+    \instituterow{Valley View School}{Jamshedpur, India}\\[1pt]
+    {\fontsize{8.5pt}{10pt}\selectfont Intermediate: PCM \hfill Apr' 22 -- Mar' 23}\\
+    {\fontsize{8.5pt}{10pt}\selectfont Percentage:\quad 63}
+
+\end{itemize}
+
+\end{document}
