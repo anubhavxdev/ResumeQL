@@ -1,4 +1,5 @@
 const rateLimit = require("express-rate-limit");
+const { ipKeyGenerator } = require("express-rate-limit");
 const logger = require("../utils/logger");
 
 /**
@@ -10,7 +11,11 @@ module.exports = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 5,
   keyGenerator: (req) => {
-    return req.user?.id || req.ip || "unknown-client";
+    // Use user ID if available, otherwise fall back to IP with proper IPv6 support
+    if (req.user?.id) {
+      return req.user.id;
+    }
+    return ipKeyGenerator(req); // Handles both IPv4 and IPv6 properly
   },
   handler: (req, res) => {
     logger.warn(`User Throttled: ${req.user?.id || req.ip} exceeded generation limit`);
