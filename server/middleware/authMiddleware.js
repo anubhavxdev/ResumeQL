@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -9,13 +10,25 @@ module.exports = (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = decoded;
+    // High Security: Check DB for user status & role every time
+    // Optional: for performance, just use 'decoded' if role is in JWT
+    const user = await User.findById(decoded.id).select("role status");
+    
+    if (!user || user.status === "blocked") {
+       return res.status(403).json({ msg: "Access revoked or user not found" });
+    }
+
+    req.user = {
+      id: decoded.id,
+      role: user.role,
+      status: user.status
+    };
+    
     next();
 
   } catch (err) {
-    return res.status(401).json({ msg: "Invalid token" });
+    return res.status(401).json({ msg: "Invalid or expired token" });
   }
 };

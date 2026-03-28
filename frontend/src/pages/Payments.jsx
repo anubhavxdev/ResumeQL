@@ -1,48 +1,49 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Zap, Coins, CreditCard, ArrowRight, ShieldCheck, History } from 'lucide-react';
+import { Check, Coins, ArrowRight, ShieldCheck, CreditCard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
 import { useAuth } from '../hooks/useAuth';
-import Navbar from '../components/layout/Navbar';
 import { Button } from '../components/ui/button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const coinPlans = [
   {
-    name: "Starter Pack",
+    name: "Starter",
     price: 10,
     coins: 500,
-    description: "Perfect for a few job applications.",
-    features: ["10 Resume Generations", "ATS Scoring included", "PDF Downloads", "Email Support"],
+    description: "Perfect for applying to a few specific roles.",
+    features: ["10 Resume Generations", "Core ATS Scoring", "PDF Exports", "Standard Support"],
     recommended: false,
-    color: "from-blue-500/20 to-blue-500/5",
-    border: "border-blue-500/30"
+    color: "from-blue-500/10 to-transparent",
+    border: "border-ghost"
   },
   {
-    name: "Pro Professional",
+    name: "Professional",
     price: 49,
     coins: 2500,
-    description: "Best for active job seekers.",
-    features: ["50 Resume Generations", "AI Optimization loop", "Priority Support", "History Storage"],
+    description: "Ideal for active and serious job seekers.",
+    features: ["50 Resume Generations", "Advanced AI Optimization", "Priority Support", "Unlimited History"],
     recommended: true,
-    color: "from-purple-500/20 to-purple-500/5",
-    border: "border-purple-500/50"
+    color: "from-primary/10 to-transparent",
+    border: "border-primary/30"
   },
   {
-    name: "Career Growth",
+    name: "Career Scale",
     price: 99,
     coins: 6000,
-    description: "Unlimited potential for power users.",
-    features: ["120 Resume Generations", "Everything in Pro+", "Beta access to features", "Personalized Support"],
+    description: "Maximum bandwidth for high-volume applying.",
+    features: ["120 Resume Generations", "Everything in Professional", "Early Beta Features", "1-on-1 Review Session"],
     recommended: false,
-    color: "from-emerald-500/20 to-emerald-500/5",
-    border: "border-emerald-500/30"
+    color: "from-emerald-500/10 to-transparent",
+    border: "border-ghost"
   }
 ];
 
 const Payments = () => {
   const { user, fetchUser } = useAuth();
   const [loading, setLoading] = useState(null);
+  useDocumentTitle('Purchase Credits');
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -79,7 +80,7 @@ const Payments = () => {
         amount: amount,
         currency: currency,
         name: "ResumeQL",
-        description: `Purchase ${plan.coins} coins`,
+        description: `Secure purchase of ${plan.coins} credits`,
         order_id: orderId,
         handler: async (response) => {
           try {
@@ -90,7 +91,7 @@ const Payments = () => {
               razorpay_signature: response.razorpay_signature
             });
             
-            toast.success("Payment successful! Coins credited.");
+            toast.success("Payment successful! Credits instantly applied.");
             fetchUser(); // Refresh user data to show new coins
           } catch (err) {
             toast.error("Payment verification failed. Please contact support.");
@@ -101,7 +102,7 @@ const Payments = () => {
           email: user.email,
         },
         theme: {
-          color: "#9333ea",
+          color: "#4648d4", // Using the primary token color
         },
       };
 
@@ -109,98 +110,102 @@ const Payments = () => {
       paymentObject.open();
 
     } catch (err) {
-      toast.error(err.response?.data?.msg || "Failed to initiate payment");
+      toast.error(err.response?.data?.msg || "Failed to initiate transaction");
     } finally {
       setLoading(null);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black pt-16">
-      <Navbar />
+    <div className="pb-12 text-on-surface">
+      <header className="mb-12 border-b border-outline-variant/30 pb-6 w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">Billing & Upgrades</h1>
+          <p className="text-on-surface-variant text-lg">Invest in your career. Only pay for the compute you need.</p>
+        </div>
+        <div className="flex items-center gap-3 bg-surface-container-low px-5 py-3 rounded-2xl border border-ghost shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container-highest text-orange-500">
+            <Coins className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Available Balance</p>
+            <p className="text-xl font-bold tracking-tight text-on-surface">{user?.coins || 0} Credits</p>
+          </div>
+        </div>
+      </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-16 text-center">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 max-w-6xl mx-auto">
+        {coinPlans.map((plan, i) => (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            key={plan.name}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 mb-4"
+            transition={{ delay: i * 0.1 }}
+            className={`relative flex flex-col rounded-3xl border bg-surface-container-lowest p-8 shadow-sm transition-all hover:shadow-ambient ${plan.border}`}
           >
-            <Coins className="h-6 w-6 text-purple-500" />
-            <span className="text-xl font-bold text-white">{user?.coins} Coins Available</span>
-          </motion.div>
-          <h1 className="text-4xl font-extrabold text-white sm:text-5xl">Simple Pricing, Zero Stress</h1>
-          <p className="mt-4 text-zinc-400 text-lg">1 INR = 50 Coins. Only pay for what you use.</p>
-        </header>
+            {plan.recommended && (
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-primary-container px-4 py-1 rounded-full text-xs font-bold text-on-primary uppercase tracking-widest shadow-sm">
+                Most Popular
+              </div>
+            )}
+            
+            <div className={`absolute top-0 left-0 w-full h-32 bg-gradient-to-b ${plan.color} rounded-t-3xl opacity-50 pointer-events-none`} />
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {coinPlans.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative flex flex-col rounded-3xl border ${plan.border} bg-zinc-900/30 p-8 backdrop-blur-xl ${
-                 plan.recommended ? 'scale-105 shadow-[0_0_40px_rgba(147,51,234,0.1)]' : ''
-              }`}
-            >
-              {plan.recommended && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-600 px-4 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider">
-                  Most Popular
-                </div>
-              )}
-
-              <div className="mb-8">
-                <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                <p className="mt-2 text-sm text-zinc-500">{plan.description}</p>
-                <div className="mt-6 flex items-baseline">
-                  <span className="text-4xl font-extrabold text-white">₹{plan.price}</span>
-                  <span className="ml-2 text-zinc-500">one-time</span>
-                </div>
-                <div className="mt-2 text-sm font-semibold text-purple-500">
-                  {plan.coins} Credits
+            <div className="mb-8 relative z-10">
+              <h3 className="text-2xl font-bold text-on-surface">{plan.name}</h3>
+              <p className="mt-2 text-sm text-on-surface-variant h-10">{plan.description}</p>
+              
+              <div className="mt-6 flex items-baseline gap-1">
+                <span className="text-4xl font-bold tracking-tight text-on-surface">₹{plan.price}</span>
+                <span className="text-sm font-semibold text-on-surface-variant">INR</span>
+              </div>
+              
+              <div className="mt-4 flex items-center gap-2">
+                <div className="h-8 rounded-full bg-surface-container-high px-3 border border-ghost flex items-center gap-1.5 w-fit">
+                  <Coins className="h-4 w-4 text-orange-500" />
+                  <span className="text-sm font-bold text-on-surface">{plan.coins} Credits</span>
                 </div>
               </div>
+            </div>
 
-              <ul className="mb-8 grow space-y-4">
-                {plan.features.map(feature => (
-                  <li key={feature} className="flex items-start gap-3 text-sm text-zinc-400">
-                    <Check className="h-5 w-5 shrink-0 text-emerald-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+            <ul className="mb-8 grow space-y-4 relative z-10">
+              {plan.features.map(feature => (
+                <li key={feature} className="flex items-start gap-3 text-sm font-medium text-on-surface-variant">
+                  <Check className="h-5 w-5 shrink-0 text-primary" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
 
-              <Button
-                onClick={() => handlePurchase(plan)}
-                disabled={loading === plan.name}
-                className={`w-full py-6 text-lg font-bold transition-all active:scale-[0.98] ${
-                  plan.recommended 
-                    ? 'bg-purple-600 hover:bg-purple-700' 
-                    : 'bg-zinc-800 hover:bg-zinc-700'
-                }`}
-              >
-                {loading === plan.name ? 'Processing...' : (
-                   <span className="flex items-center gap-2">
-                     Get Credits <ArrowRight className="h-5 w-5" />
-                   </span>
-                )}
-              </Button>
-            </motion.div>
-          ))}
-        </div>
+            <Button
+              onClick={() => handlePurchase(plan)}
+              disabled={loading === plan.name}
+              variant={plan.recommended ? 'default' : 'outline'}
+              className={`w-full py-6 text-base font-bold transition-all relative z-10 ${
+                !plan.recommended ? 'bg-surface hover:bg-surface-container-low border-ghost' : 'shadow-ambient'
+              }`}
+            >
+              {loading === plan.name ? 'Processing Securely...' : (
+                  <span className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4" /> Purchase Plan
+                  </span>
+              )}
+            </Button>
+          </motion.div>
+        ))}
+      </div>
 
-        <section className="mt-20 rounded-3xl border border-zinc-800 bg-zinc-900/20 p-8 text-center sm:p-12">
-           <div className="mx-auto max-w-2xl">
-              <ShieldCheck className="mx-auto mb-4 h-12 w-12 text-emerald-500" />
-              <h2 className="text-2xl font-bold text-white">Secure Payments via Razorpay</h2>
-              <p className="mt-4 text-zinc-400">
-                We use industry-standard encryption to protect your transaction details. 
-                Coins are credited instantly upon successful payment verification.
-              </p>
-           </div>
-        </section>
-      </main>
+      <section className="mt-16 max-w-4xl mx-auto rounded-3xl border border-ghost bg-surface-container-low p-8 text-center sm:p-12 shadow-sm">
+          <div className="mx-auto flex flex-col items-center">
+            <div className="h-16 w-16 bg-surface rounded-2xl border border-ghost shadow-sm flex items-center justify-center mb-6">
+              <ShieldCheck className="h-8 w-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-on-surface tracking-tight">Enterprise-Grade Security</h2>
+            <p className="mt-4 text-on-surface-variant max-w-2xl leading-relaxed font-medium">
+              We partner with Razorpay to process payments securely. Your financial data is fully encrypted and never stored on our servers. Credits are applied instantly to your workspace.
+            </p>
+          </div>
+      </section>
     </div>
   );
 };

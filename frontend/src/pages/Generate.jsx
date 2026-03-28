@@ -1,256 +1,385 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckCircle2, AlertCircle, RefreshCcw, Sparkles } from 'lucide-react';
+import { FileText, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, AlertCircle, RefreshCcw } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import Navbar from '../components/layout/Navbar';
 import { Button } from '../components/ui/button';
 import { useAuth } from '../hooks/useAuth';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const genzPhrases = [
-  "Let him cook... 🔥",
-  "Optimizing the rizz in your resume... 😎",
-  "No cap, this is about to be fire... 🧢",
-  "Vibe checking the Job Description... ✨",
-  "Hold tight, main character moment incoming... 🎬",
-  "Lowkey securing the bag for you... 💰",
-  "AI is doing the heavy lifting rn... 💪",
-  "Ate the ATS and left no crumbs... 🍽️",
+  "Structuring your narrative...",
+  "Running ATS compatibility checks...",
+  "Formatting credentials...",
+  "Optimizing keyword density...",
+  "Drafting LaTeX document...",
+  "Finalizing editorial layout...",
+];
+
+const steps = [
+  { id: 1, title: 'Target Role', subtitle: 'Job Description' },
+  { id: 2, title: 'Profile', subtitle: 'Personal Details' },
+  { id: 3, title: 'Experience', subtitle: 'Work History' },
+  { id: 4, title: 'Skills & Edu', subtitle: 'Qualifications' },
 ];
 
 const Generate = () => {
   const { user, fetchUser } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ cv: '', jd: '' });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [atsResult, setAtsResult] = useState(null);
+  useDocumentTitle('Resume Builder');
   
-  // Rotating phrase logic
+  const [step, setStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [phraseIndex, setPhraseIndex] = useState(0);
+  
+  const [formData, setFormData] = useState({
+    jd: '',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: '',
+    links: '',
+    experience: '',
+    education: '',
+    skills: ''
+  });
+
+  const [atsResult, setAtsResult] = useState(null);
+  const [analyzingAts, setAnalyzingAts] = useState(false);
+
+  // Centralized Step Validation Logic
+  const validateStep = (currentStep) => {
+    switch (currentStep) {
+      case 1:
+        return formData.jd.trim().length > 20;
+      case 2:
+        return (
+          formData.name.trim().length > 2 &&
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+          formData.phone.trim().length > 5
+        );
+      case 3:
+        return formData.experience.trim().length > 50;
+      case 4:
+        return formData.education.trim().length > 10 && formData.skills.trim().length > 5;
+      default:
+        return true;
+    }
+  };
+
+  const isCurrentStepValid = validateStep(step);
 
   useEffect(() => {
     let interval;
     if (isGenerating) {
       interval = setInterval(() => {
         setPhraseIndex((prev) => (prev + 1) % genzPhrases.length);
-      }, 3000);
+      }, 2500);
     } else {
       setPhraseIndex(0);
     }
     return () => clearInterval(interval);
   }, [isGenerating]);
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleCalculateATS = async () => {
-    if (!formData.cv || !formData.jd) {
-      return toast.error('CV and Job Description are required for scoring');
+  const constructCV = () => {
+    return `
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Links: ${formData.links}
+
+Experience:
+${formData.experience}
+
+Education:
+${formData.education}
+
+Skills:
+${formData.skills}
+    `.trim();
+  };
+
+  const handleNext = () => {
+    if (!validateStep(step)) {
+      return toast.error("Please complete all required fields for this step.");
     }
+    setStep(prev => Math.min(prev + 1, steps.length));
+  };
+  
+  const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
+
+  const handleCalculateATS = async () => {
+    if (!validateStep(1)) return toast.error('Please provide a job description first.');
+    const cv = constructCV();
+    if (cv.length < 50) return toast.error('Please provide basic profile and experience details.');
+    
+    setAnalyzingAts(true);
     try {
-      const res = await api.post('/generate/ats-score', { cv: formData.cv, jd: formData.jd });
+      const res = await api.post('/generate/ats-score', { cv, jd: formData.jd });
       setAtsResult(res.data);
-      toast.success('ATS analysis complete!');
+      toast.success('ATS analysis complete');
     } catch (err) {
       toast.error('Failed to calculate ATS score');
+    } finally {
+      setAnalyzingAts(false);
     }
   };
 
   const handleGenerate = async () => {
-    if (!formData.cv || !formData.jd) {
-      return toast.error('CV and Job Description are required');
+    // Final hard-validation check
+    for (let i = 1; i <= 4; i++) {
+        if (!validateStep(i)) {
+            setStep(i);
+            return toast.error(`Incomplete details in Step ${i}. Check highlighted fields.`);
+        }
     }
+
+    const cv = constructCV();
     if (user.coins < 50) {
-      return toast.error('Insufficient coins. Please top up.');
+      return toast.error('Insufficient coins. Please purchase more.');
     }
 
     setIsGenerating(true);
     try {
-      const res = await api.post('/generate/generate', { cv: formData.cv, jd: formData.jd });
-      const updatedLatex = res.data.updatedLatex;
-      sessionStorage.setItem('resumeLatex', updatedLatex);
-      toast.success('Resume optimized! Redirecting...');
+      const res = await api.post('/generate/generate', { cv, jd: formData.jd });
+      sessionStorage.setItem('resumeLatex', res.data.updatedLatex);
       fetchUser();
       navigate('/result');
     } catch (err) {
       toast.error(err.response?.data?.msg || 'AI generation failed');
-    } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black pt-16 relative overflow-hidden">
-      {/* FULLSCREEN LOADING OVERLAY */}
+    <div className="pb-12 text-on-surface">
+      {/* Fullscreen Loading Overlay */}
       <AnimatePresence>
         {isGenerating && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-surface/80 backdrop-blur-md"
           >
-            <div className="flex flex-col items-center justify-center text-center space-y-8 px-4">
-              <div className="relative">
-                <div className="h-24 w-24 rounded-full border-4 border-zinc-800 flex items-center justify-center">
-                  <div className="h-24 w-24 rounded-full border-t-4 border-purple-500 animate-spin absolute top-0 left-0"></div>
-                  <Sparkles className="h-8 w-8 text-purple-400 animate-pulse" />
-                </div>
-              </div>
-              
-              <div className="h-16 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center p-8 bg-surface-container-lowest rounded-2xl shadow-ambient border border-ghost max-w-sm w-full">
+              <div className="h-16 w-16 mb-6 rounded-full border-4 border-surface-container-high border-t-primary animate-spin" />
+              <div className="h-8 overflow-hidden relative w-full text-center">
                 <AnimatePresence mode="wait">
-                  <motion.h2
+                  <motion.p
                     key={phraseIndex}
-                    initial={{ y: 20, opacity: 0, scale: 0.9 }}
-                    animate={{ y: 0, opacity: 1, scale: 1 }}
-                    exit={{ y: -20, opacity: 0, scale: 0.9 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                    className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -20, opacity: 0 }}
+                    className="text-lg font-bold tracking-tight text-primary absolute w-full"
                   >
                     {genzPhrases[phraseIndex]}
-                  </motion.h2>
+                  </motion.p>
                 </AnimatePresence>
               </div>
-
-              <p className="text-zinc-500 font-mono text-sm max-w-xs leading-relaxed animate-pulse">
-                Taking 1-3 minutes.<br />
-                Do not close or refresh this page.
+              <p className="mt-4 text-xs font-semibold text-on-surface-variant uppercase tracking-widest">
+                DO NOT CLOSE THIS PAGE
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <Navbar />
+      <header className="mb-8 border-b border-outline-variant/30 pb-6 w-full flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Resume Architect</h1>
+          <p className="text-on-surface-variant">Build a highly tailored resume in 4 simple steps.</p>
+        </div>
+      </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 text-white">
-        <header className="mb-12 text-center">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-1 text-sm font-medium text-purple-400 mb-4"
-          >
-            <Sparkles className="h-4 w-4" /> Powered by Gemini AI
-          </motion.div>
-          <h1 className="text-4xl font-bold tracking-tight">AI Resume Optimizer</h1>
-          <p className="mt-4 text-zinc-400">Tailor your resume for any Job Description in seconds.</p>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left: Inputs */}
-          <div className="space-y-8">
-            <div className="space-y-2">
-              <label className="text-lg font-semibold flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-purple-500" /> Current CV Content
-              </label>
-              <textarea
-                name="cv"
-                value={formData.cv}
-                onChange={handleInputChange}
-                className="h-64 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 text-zinc-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                placeholder="Paste your plain text resume content here..."
-              />
+      {/* Stepper Progress */}
+      <div className="max-w-4xl mx-auto mb-10">
+        <div className="flex items-center justify-between relative">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[2px] bg-surface-container-high -z-10" />
+          <div 
+            className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-primary transition-all duration-500 ease-in-out -z-10" 
+            style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+          />
+          {steps.map((s) => (
+            <div key={s.id} className="flex flex-col items-center">
+              <div 
+                className={`flex h-10 w-10 items-center justify-center rounded-full font-bold transition-all duration-300 ${
+                  step >= s.id 
+                    ? 'bg-primary text-on-primary shadow-ambient' 
+                    : 'bg-surface-container-highest text-on-surface-variant'
+                }`}
+              >
+                {step > s.id ? <CheckCircle2 className="h-5 w-5" /> : s.id}
+              </div>
+              <div className="hidden sm:block mt-3 text-center">
+                <p className={`text-sm font-bold ${step >= s.id ? 'text-on-surface' : 'text-on-surface-variant'}`}>{s.title}</p>
+                <p className="text-xs text-on-surface-variant">{s.subtitle}</p>
+              </div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="space-y-2">
-              <label className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-purple-500" /> Job Description
-              </label>
-              <textarea
-                name="jd"
-                value={formData.jd}
-                onChange={handleInputChange}
-                className="h-64 w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 text-zinc-300 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                placeholder="Paste the job description you are targeting..."
-              />
-            </div>
-          </div>
+      <div className="max-w-4xl mx-auto bg-surface-container-lowest rounded-2xl border border-ghost shadow-sm overflow-hidden flex flex-col md:min-h-[600px]">
+        {/* Form Area */}
+        <div className="p-6 sm:p-10 flex-1 h-full">
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4 h-[450px] flex flex-col">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-on-surface">Target Job Description</h2>
+                  <p className="text-on-surface-variant text-sm mt-1">Paste the exact job description to align your keywords.</p>
+                </div>
+                <label htmlFor="jd" className="sr-only">Job Description</label>
+                <textarea
+                  id="jd"
+                  name="jd"
+                  value={formData.jd}
+                  onChange={handleChange}
+                  className="flex-1 w-full rounded-xl border border-ghost bg-surface-container-low p-5 text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary outline-none transition-all resize-none shadow-inner"
+                  placeholder="Senior Frontend Developer&#10;&#10;Responsibilities:&#10;- Architect complex react applications...&#10;- Lead a team of...&#10;&#10;Requirements:&#10;- 5+ years React...&#10;- Experience with Next.js..."
+                />
+              </motion.div>
+            )}
 
-          {/* Right: Analysis & Generate */}
-          <div className="space-y-8">
-            <div className="rounded-3xl border border-zinc-800 bg-zinc-900/30 p-8 backdrop-blur-xl">
-              <div className="mb-8 space-y-4">
-                <Button
-                  onClick={handleCalculateATS}
-                  variant="outline"
-                  className="w-full border-zinc-800 hover:bg-zinc-800 h-14 text-lg"
-                >
-                  <RefreshCcw className="mr-2 h-5 w-5" /> Analyze ATS Score
-                </Button>
+            {step === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-on-surface">Personal Profile</h2>
+                  <p className="text-on-surface-variant text-sm mt-1">The header information for your resume.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="fullName" className="text-sm font-bold text-on-surface">Full Name</label>
+                    <input id="fullName" name="name" value={formData.name} onChange={handleChange} className="w-full rounded-lg bg-surface-container-low border border-ghost px-4 py-3 outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-bold text-on-surface">Email Address</label>
+                    <input id="email" name="email" value={formData.email} onChange={handleChange} type="email" className="w-full rounded-lg bg-surface-container-low border border-ghost px-4 py-3 outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="text-sm font-bold text-on-surface">Phone Number</label>
+                    <input id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full rounded-lg bg-surface-container-low border border-ghost px-4 py-3 outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="links" className="text-sm font-bold text-on-surface">Links (LinkedIn, Portfolio)</label>
+                    <input id="links" name="links" value={formData.links} onChange={handleChange} className="w-full rounded-lg bg-surface-container-low border border-ghost px-4 py-3 outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all" placeholder="github.com/johndoe | linkedin.com/in/johndoe" />
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-                <AnimatePresence>
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4 h-[450px] flex flex-col">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-on-surface">Work Experience</h2>
+                  <p className="text-on-surface-variant text-sm mt-1">Paste your raw work history. The AI will optimally format and rewrite it.</p>
+                </div>
+                <label htmlFor="experience" className="sr-only">Work Experience</label>
+                <textarea
+                  id="experience"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  className="flex-1 w-full rounded-xl border border-ghost bg-surface-container-low p-5 text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary outline-none transition-all resize-none shadow-inner"
+                  placeholder="Software Engineer at Tech Corp (2020-Present)&#10;- Build current project...&#10;- Improved SEO performance by 30%..."
+                />
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 flex flex-col">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-on-surface">Education & Skills</h2>
+                  <p className="text-on-surface-variant text-sm mt-1">Finalize your credentials before generation.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2 flex flex-col h-[250px]">
+                    <label htmlFor="education" className="text-sm font-bold text-on-surface">Education</label>
+                    <textarea
+                      id="education"
+                      name="education"
+                      value={formData.education}
+                      onChange={handleChange}
+                      className="flex-1 w-full rounded-xl border border-ghost bg-surface-container-low p-4 text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary outline-none transition-all resize-none shadow-inner"
+                    />
+                  </div>
+                  <div className="space-y-2 flex flex-col h-[250px]">
+                    <label htmlFor="skills" className="text-sm font-bold text-on-surface">Skills (Comma separated)</label>
+                    <textarea
+                      id="skills"
+                      name="skills"
+                      value={formData.skills}
+                      onChange={handleChange}
+                      className="flex-1 w-full rounded-xl border border-ghost bg-surface-container-low p-4 text-on-surface focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary outline-none transition-all resize-none shadow-inner"
+                    />
+                  </div>
+                </div>
+
+                {/* Optional ATS checking before generation */}
+                <div className="bg-surface-container-low rounded-xl p-5 border border-ghost mt-4">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <h4 className="font-bold text-on-surface text-sm">Optimization Check</h4>
+                      <p className="text-xs text-on-surface-variant">Check your ATS score before spending credits.</p>
+                    </div>
+                    <Button onClick={handleCalculateATS} disabled={analyzingAts} variant="outline" size="sm" className="bg-surface">
+                      {analyzingAts ? <RefreshCcw className="animate-spin h-3 w-3 mr-2" /> : <RefreshCcw className="h-3 w-3 mr-2" />}
+                      Run Score
+                    </Button>
+                  </div>
+                  
                   {atsResult && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="space-y-4"
-                    >
-                      <div className="flex items-center justify-between rounded-xl bg-purple-600/10 p-4 border border-purple-500/20">
-                        <div>
-                          <p className="text-sm font-medium text-zinc-400">Current Match</p>
-                          <p className="text-3xl font-bold text-white">{atsResult.score}%</p>
-                        </div>
-                        <div className="h-16 w-16 rounded-full border-4 border-purple-600/30 flex items-center justify-center relative">
-                          <div
-                            className="absolute top-0 left-0 w-full h-full rounded-full border-t-4 border-purple-500 origin-center"
-                            style={{ transform: `rotate(${(atsResult.score / 100) * 360}deg)` }}
-                          ></div>
-                          <span className="font-bold text-purple-500">{atsResult.score}</span>
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 pt-4 border-t border-outline-variant/30">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-bold text-on-surface text-base">Score: {atsResult.score}%</span>
+                        <div className="h-1.5 w-1/2 bg-surface-container-highest rounded-full overflow-hidden">
+                          <div className="h-full bg-primary" style={{ width: `${atsResult.score}%` }} />
                         </div>
                       </div>
-
-                      {atsResult.missingKeywords?.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-orange-500" /> Missing Keywords
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {atsResult.missingKeywords.map(k => (
-                              <span key={k} className="px-3 py-1 bg-zinc-800 rounded-full text-xs text-zinc-300 border border-zinc-700">
-                                {k}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {atsResult.suggestions && (
-                        <div className="space-y-2 rounded-xl bg-blue-500/5 p-4 border border-blue-500/10">
-                          <p className="text-sm font-medium text-blue-400 flex items-center gap-2">
-                            <Sparkles className="h-4 w-4" /> Optimization Suggestions
-                          </p>
-                          <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-wrap">
-                            {atsResult.suggestions}
-                          </p>
-                        </div>
-                      )}
                     </motion.div>
                   )}
-                </AnimatePresence>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-xs text-zinc-500 italic">
-                  * AI will optimize content using your professional template. Structure stays intact.
-                </p>
-
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || user?.coins < 50}
-                  className="w-full bg-purple-600 h-16 text-lg font-bold hover:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
-                >
-                  <span className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" /> Generate Optimized Resume (50 Coins)
-                  </span>
-                </Button>
-              </div>
-            </div>
-          </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </main>
+
+        {/* Footer Actions */}
+        <div className="p-6 sm:p-8 bg-surface-container-low border-t border-outline-variant/40 flex justify-between items-center mt-auto">
+          <Button 
+            variant="ghost" 
+            onClick={handleBack} 
+            disabled={step === 1}
+            className={`font-semibold ${step === 1 ? 'opacity-0 pointer-events-none' : ''}`}
+          >
+            <ChevronLeft className="mr-1 h-5 w-5" /> Back
+          </Button>
+          
+          {step < steps.length ? (
+            <Button 
+              onClick={handleNext} 
+              disabled={!isCurrentStepValid}
+              className={`font-semibold shadow-sm px-8 ${!isCurrentStepValid ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+            >
+              Next Step <ChevronRight className="ml-1 h-5 w-5" />
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleGenerate} 
+              disabled={!isCurrentStepValid || isGenerating}
+              className={`font-semibold px-8 shadow-ambient bg-gradient-to-r from-primary to-primary-container ${(!isCurrentStepValid || isGenerating) ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+            >
+              <Sparkles className="mr-2 h-5 w-5" /> Generate Resume (50 Credits)
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

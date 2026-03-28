@@ -8,9 +8,11 @@ const {
   getUserResumes
 } = require("../controllers/generateController");
 
-router.post("/generate", auth, generateResume);
+const userRateLimiter = require("../middleware/userRateLimiter");
+
+router.post("/generate", auth, userRateLimiter, generateResume);
 router.get("/history", auth, getUserResumes);
 router.post("/download-pdf", auth, downloadResumePDF);
-router.post("/ats-score", auth, getATSScore);
+router.post("/ats-score", auth, userRateLimiter, getATSScore);
 
 module.exports = router;

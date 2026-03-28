@@ -1,9 +1,30 @@
 const express = require("express");
-const { signup, login } = require("../controllers/authController");
+const { body } = require("express-validator");
+const { signup, login, refresh, logout } = require("../controllers/authController");
 
 const router = express.Router();
 
-router.post("/signup", signup);
-router.post("/login", login);
+// Validation Rules
+const signupValidation = [
+  body("email").isEmail().withMessage("Invalid email format").normalizeEmail(),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/\d/)
+    .withMessage("Password must contain at least one number"),
+  body("name").notEmpty().trim().escape(),
+];
+
+const loginValidation = [
+  body("email").isEmail().normalizeEmail(),
+  body("password").notEmpty(),
+];
+
+const csrfGuard = require("../middleware/csrfGuard");
+
+router.post("/signup", signupValidation, signup);
+router.post("/login", loginValidation, login);
+router.post("/refresh", csrfGuard, refresh);
+router.post("/logout", csrfGuard, logout);
 
 module.exports = router;

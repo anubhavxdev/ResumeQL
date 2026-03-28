@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #4648d4;
+  --color-primary-container: #6063ee;
+  --color-primary-fixed: #e1e0ff;
+  --color-on-primary: #ffffff;
+  
+  --color-surface: #f8f9fa;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container-high: #e7e8e9;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-container-lowest: #ffffff;
+  
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #464554;
+  
+  --color-outline-variant: #c7c4d7;
+  --color-surface-tint: #494bd6;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+  }
+}
+
+/* Glassmorphism helpers */
+@utility glass {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+}
+
+@utility glass-nav {
+  background-color: rgba(248, 249, 250, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+/* Custom shadow per design system */
+@utility shadow-ambient {
+  box-shadow: 0 20px 40px rgba(25, 28, 29, 0.06);
+}
+
+@utility border-ghost {
+  border: 1px solid rgba(199, 196, 215, 0.4); /* Increased opacity slightly for visibility, outline_variant relative */
+}
