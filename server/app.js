@@ -26,7 +26,13 @@ app.use(helmet());
 app.use(cookieParser());
 
 // Strict CORS Whitelist
-const whitelist = [process.env.CLIENT_URL, "http://localhost:5173", "http://localhost:4173"];
+const whitelist = [
+  process.env.CLIENT_URL,
+  "https://resume-ql.vercel.app", // Add your Vercel frontend URL
+  "http://localhost:5173",
+  "http://localhost:4173"
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || whitelist.indexOf(origin) !== -1) {
