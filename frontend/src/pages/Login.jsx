@@ -38,7 +38,8 @@ const Login = () => {
         }
       }, 50);
     } catch (err) {
-      toast.error(err.response?.data?.msg || 'Login failed');
+      const errorMsg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.msg || 'Login failed';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

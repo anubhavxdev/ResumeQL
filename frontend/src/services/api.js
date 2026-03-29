@@ -5,7 +5,7 @@ let onSessionExpired = null;
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'https://resumeql-server.onrender.com/api',
-  timeout: 10000, // 10s strict timeout globally
+  timeout: 60000, // 60s timeout for cold starts
   headers: {
     'Content-Type': 'application/json',
   },
