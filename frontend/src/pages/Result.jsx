@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ArrowLeft, Copy, Check, FileText, Download, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
