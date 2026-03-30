@@ -13,7 +13,9 @@ const userSchema = new mongoose.Schema({
   isLPU: { type: Boolean, default: false },
   role: { type: String, enum: ["user", "admin"], default: "user" },
   status: { type: String, enum: ["active", "blocked"], default: "active" },
-  refreshToken: { type: String, select: false } // Stored as a hash or token string
+  refreshToken: { type: String, select: false }, // Stored as a hash or token string
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);    

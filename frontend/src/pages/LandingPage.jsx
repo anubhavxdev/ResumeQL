@@ -16,6 +16,8 @@ import PricingSection from '../components/landing/PricingSection';
 import TestimonialMarquee from '../components/landing/TestimonialMarquee';
 import FooterEnriched from '../components/landing/FooterEnriched';
 import StickyCTA from '../components/landing/StickyCTA';
+import NeuralBackground from '../components/landing/NeuralBackground';
+import TechShowcase from '../components/landing/TechShowcase';
 
 const LandingPage = () => {
   useDocumentTitle('Premium AI Resume Builder');
@@ -28,7 +30,8 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col font-sans text-on-surface overflow-x-hidden selection:bg-primary/20">
+    <div className="min-h-screen bg-surface flex flex-col font-sans text-on-surface overflow-x-hidden selection:bg-primary/20 relative">
+      <NeuralBackground />
       <AnnouncementBar />
       
       {/* Navigation */}
@@ -128,8 +131,8 @@ const LandingPage = () => {
           </Link>
         </motion.div>
 
-        {/* Interactive Demo Integration */}
-        <InteractiveDemo />
+        {/* Premium Tech Showcase Showcase */}
+        <TechShowcase />
       </section>
 
       {/* Social Proof */}
@@ -138,6 +141,7 @@ const LandingPage = () => {
       {/* Core Logic Grid (Enriched) */}
       <section id="how-it-works" className="py-24 bg-surface-container-low/30 border-y border-outline-variant/30">
          <Timeline />
+         <InteractiveDemo />
          <BeforeAfter />
       </section>
 

@@ -122,7 +122,7 @@ const Login = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="password" className="text-sm font-semibold text-on-surface">Password</label>
-                  <a href="#" className="text-xs font-semibold text-primary hover:text-primary-container transition-colors">Forgot password?</a>
+                  <Link to="/forgot-password" size="sm" className="text-xs font-semibold text-primary hover:text-primary-container transition-colors">Forgot password?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-variant" />

@@ -182,3 +182,73 @@ exports.logout = async (req, res, next) => {
     next(err);
   }
 };
+
+// --- FORGOT PASSWORD ---
+exports.forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ msg: "User with this email does not exist" });
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    
+    // Hash and save token to user model
+    user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    await user.save();
+
+    // In a real app, send an email. For now, we log it.
+    const resetUrl = `${req.get("origin")}/reset-password/${resetToken}`;
+    
+    logger.info(`PASSWORD RESET REQUESTED: ${user.email} | URL: ${resetUrl}`);
+    
+    // Mocking email send
+    console.log("-----------------------------------------");
+    console.log(`To: ${user.email}`);
+    console.log(`Subject: Password Reset Request`);
+    console.log(`Link: ${resetUrl}`);
+    console.log("-----------------------------------------");
+
+    res.json({ msg: "Reset link generated and sent to email (simulated)" });
+
+  } catch (err) {
+    next(err);
+  }
+};
+
+// --- RESET PASSWORD ---
+exports.resetPassword = async (req, res, next) => {
+  const token = req.params.token;
+  const resetPasswordToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid or expired reset token" });
+    }
+
+    // Set new password
+    const salt = await bcrypt.genSalt(12);
+    user.password = await bcrypt.hash(req.body.password, salt);
+    
+    // Clear reset fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+    
+    logger.info(`Password successfully reset for user: ${user._id}`);
+    res.json({ msg: "Password recovery successful. Please login with your new credentials." });
+
+  } catch (err) {
+    next(err);
+  }
+};

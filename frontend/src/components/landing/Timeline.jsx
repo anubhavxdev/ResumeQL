@@ -14,6 +14,7 @@ const Timeline = () => {
       icon: Zap,
       title: 'AI Transformation',
       desc: 'Paste a target job. Gemini rewrites your experience in LaTeX.',
+      image: '/ats_score_gauge_visual_1774816009861.png',
       delay: 0.2
     },
     {
@@ -55,6 +56,23 @@ const Timeline = () => {
               <p className="text-[#6B7280] leading-relaxed max-w-[280px]">
                 {step.desc}
               </p>
+              
+              {step.image && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="mt-8 relative w-40 h-40 rounded-2xl overflow-hidden border border-primary/10 shadow-2xl group-hover:scale-105 transition-transform duration-500"
+                >
+                   <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
+                   <div className="absolute inset-0 bg-linear-to-t from-primary/20 to-transparent opacity-40" />
+                   {/* Pulsing ring around the gauge image */}
+                   <motion.div 
+                     animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.1, 1] }}
+                     transition={{ duration: 3, repeat: Infinity }}
+                     className="absolute inset-0 border-2 border-primary/30 rounded-2xl pointer-events-none"
+                   />
+                </motion.div>
+              )}
               
               {idx < steps.length - 1 && (
                 <div className="mt-6 md:hidden text-primary animate-bounce">

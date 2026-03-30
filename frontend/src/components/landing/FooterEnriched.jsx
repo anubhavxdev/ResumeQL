@@ -20,6 +20,7 @@ const FooterEnriched = () => {
         { name: 'Engineering Blog', href: '/blog' },
         { name: 'Changelog', href: '/changelog' },
         { name: 'Privacy Policy', href: '/privacy' },
+        { name: 'Terms of Service', href: '/terms' },
       ]
     },
     {

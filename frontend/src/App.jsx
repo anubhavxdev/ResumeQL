@@ -18,6 +18,21 @@ const Result = lazy(() => import('./pages/Result'));
 const Payments = lazy(() => import('./pages/Payments'));
 const Profile = lazy(() => import('./pages/Profile'));
 
+// Supplementary Pages
+const Blog = lazy(() => import('./pages/Blog'));
+const Changelog = lazy(() => import('./pages/Changelog'));
+const Support = lazy(() => import('./pages/Support'));
+const Guide = lazy(() => import('./pages/Guide'));
+const Keywords = lazy(() => import('./pages/Keywords'));
+const ApiDocs = lazy(() => import('./pages/ApiDocs'));
+const PrivacyPolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('./pages/Legal').then(m => ({ default: m.TermsOfService })));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const PaymentFailed = lazy(() => import('./pages/PaymentFailed'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
 // Admin Pages
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminProtectedRoute = lazy(() => import('./components/AdminProtectedRoute'));
@@ -79,7 +94,17 @@ const App = () => {
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password/:token" element={<ResetPassword />} />
                   <Route path="/about" element={<Creator />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/changelog" element={<Changelog />} />
+                  <Route path="/support" element={<Support />} />
+                  <Route path="/guide" element={<Guide />} />
+                  <Route path="/keywords" element={<Keywords />} />
+                  <Route path="/api-docs" element={<ApiDocs />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
                   
                   {/* User Protected Routes using SidebarLayout */}
                   <Route element={<ProtectedRoute><SidebarLayout /></ProtectedRoute>}>
@@ -87,6 +112,8 @@ const App = () => {
                     <Route path="/generate" element={<Generate />} />
                     <Route path="/result" element={<Result />} />
                     <Route path="/payments" element={<Payments />} />
+                    <Route path="/payment/success" element={<PaymentSuccess />} />
+                    <Route path="/payment/failed" element={<PaymentFailed />} />
                     <Route path="/profile" element={<Profile />} />
                   </Route>
 
@@ -100,6 +127,9 @@ const App = () => {
                        <Route path="/admin/health" element={<AdminHealth />} />
                     </Route>
                   </Route>
+
+                  {/* Catch-all 404 */}
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </div>
